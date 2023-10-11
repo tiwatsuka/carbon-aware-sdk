@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/azure-functions/dotnet:4.0 AS base
 WORKDIR /home/site/wwwroot
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 COPY ["src/", "data/src/"]
 COPY ["scripts/", "data/scripts/"]
 COPY ["samples/", "data/samples/"]
