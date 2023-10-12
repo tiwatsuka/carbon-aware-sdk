@@ -19,8 +19,6 @@ var serviceVersion = "1.0.0";
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<CarbonMetrics>();
-
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracerProviderBuilder =>
         tracerProviderBuilder
@@ -33,9 +31,13 @@ builder.Services.AddOpenTelemetry()
         .AddAspNetCoreInstrumentation())
     .WithMetrics(meterProviderBuilder =>
         meterProviderBuilder
+            .ConfigureServices(services => 
+            {
+                services.AddSingleton<MetricsResourceDetector>();
+                services.AddSingleton<CarbonMetrics>();
+            })
+            .ConfigureResource(rb => rb.AddDetector(sp => sp.GetRequiredService<MetricsResourceDetector>()))
             .AddMeter(CarbonMetrics.MeterName)
-
-
             .AddPrometheusExporter()
 );
 
@@ -123,7 +125,6 @@ app.MapControllers();
 
 app.MapHealthChecks("/health");
 
-app.Services.GetService<CarbonMetrics>();
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.Run();

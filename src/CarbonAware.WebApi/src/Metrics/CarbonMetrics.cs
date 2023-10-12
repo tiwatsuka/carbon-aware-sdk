@@ -15,21 +15,21 @@ public class CarbonMetrics : IDisposable
     private readonly ILocationHandler locationHandler;
     private readonly Meter meter;
     private readonly Timer timer;
-    private readonly IDictionary<string, double> emissions = new Dictionary<string, double>();
+    private readonly IDictionary<string, Measurement<double>> emissions = new Dictionary<string, Measurement<double>>();
 
     private readonly Random rand = new Random();  // for demo purpose
 
     public ActivitySource ActivitySource { get; }
     private readonly IDictionary<string, ObservableGauge<double>> gauges = new Dictionary<string, ObservableGauge<double>>();
 
-    public CarbonMetrics(ILogger<CarbonMetrics> logger, IEmissionsHandler emissionsHandler, ILocationHandler locationHandler)
+    public CarbonMetrics(IMeterFactory meterFactory, ILogger<CarbonMetrics> logger, IEmissionsHandler emissionsHandler, ILocationHandler locationHandler)
     {
         this.emissionsHandler = emissionsHandler ?? throw new ArgumentNullException(nameof(emissionsHandler));
         this.locationHandler = locationHandler ?? throw new ArgumentNullException(nameof(locationHandler));
 
         string? version = typeof(CarbonMetrics).Assembly.GetName().Version?.ToString();
         this.ActivitySource = new ActivitySource(ActivitySourceName, version);
-        this.meter = new Meter(MeterName, version);
+        this.meter = meterFactory.Create(MeterName, version);
 
         this.timer = new Timer(this.GetCarbon, null, 0, 5000);
     }
@@ -55,14 +55,14 @@ public class CarbonMetrics : IDisposable
             foreach (var x in emissions){
                 if (!this.gauges.ContainsKey(x.Location)) {
                     this.gauges[x.Location] = 
-                        this.meter.CreateObservableGauge<double>("carbon.aware.emission." + x.Location, () => GetEmission(x.Location));
+                        this.meter.CreateObservableGauge<double>("carbon.aware.emission", () => GetEmission(x.Location));
                 }
-                this.emissions[x.Location] = x.Rating;
+                this.emissions[x.Location] = new Measurement<double>(x.Rating, new TagList(){{"location", x.Location}});
             }
         });
     }
 
-    public double GetEmission(string location){
+    public Measurement<double> GetEmission(string location){
         return this.emissions[location];
     }
 }
