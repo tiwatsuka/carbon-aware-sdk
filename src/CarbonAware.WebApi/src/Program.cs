@@ -2,13 +2,16 @@ using CarbonAware;
 using CarbonAware.WebApi.Configuration;
 using Microsoft.AspNetCore.StaticFiles;
 using CarbonAware.WebApi.Filters;
+using CarbonAware.WebApi.Metrics;
 using GSF.CarbonAware.Configuration;
 using GSF.CarbonAware.Exceptions;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using System.Diagnostics.Metrics;
 
 // Define constants to initialize tracing with
 var serviceName = "CarbonAware.WebAPI";
@@ -16,17 +19,25 @@ var serviceVersion = "1.0.0";
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenTelemetryTracing(tracerProviderBuilder =>
-{
-    tracerProviderBuilder
+builder.Services.AddSingleton<CarbonMetrics>();
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracerProviderBuilder =>
+        tracerProviderBuilder
         .AddConsoleExporter()
         .AddSource(serviceName)
         .SetResourceBuilder(
             ResourceBuilder.CreateDefault()
                 .AddService(serviceName: serviceName, serviceVersion: serviceVersion))
         .AddHttpClientInstrumentation()
-        .AddAspNetCoreInstrumentation();
-});
+        .AddAspNetCoreInstrumentation())
+    .WithMetrics(meterProviderBuilder =>
+        meterProviderBuilder
+            .AddMeter(CarbonMetrics.MeterName)
+
+
+            .AddPrometheusExporter()
+);
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
@@ -111,6 +122,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHealthChecks("/health");
+
+app.Services.GetService<CarbonMetrics>();
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.Run();
 
