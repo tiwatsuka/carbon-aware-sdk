@@ -1,4 +1,4 @@
-using System.Threading;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using GSF.CarbonAware.Handlers;
@@ -11,16 +11,25 @@ public class CarbonMetrics : IDisposable
     internal const string MeterName = "Carbon.Aware.Metric";
     internal const string ActivitySourceName = "Carbon.Aware.Metric";
 
+    internal const Int32 UpdateInterval = 5000;
+
     private readonly IEmissionsHandler emissionsHandler;
     private readonly ILocationHandler locationHandler;
+
+    private string[] locations;
+
     private readonly Meter meter;
     private readonly Timer timer;
-    private readonly IDictionary<string, Measurement<double>> emissions = new Dictionary<string, Measurement<double>>();
+    private readonly IDictionary<string, Measurement<double>> intensities = new Dictionary<string, Measurement<double>>();
 
     private readonly Random rand = new Random();  // for demo purpose
 
     public ActivitySource ActivitySource { get; }
     private readonly IDictionary<string, ObservableGauge<double>> gauges = new Dictionary<string, ObservableGauge<double>>();
+
+    private readonly ReaderWriterLockSlim locationLock = new ReaderWriterLockSlim();
+
+    private readonly ReaderWriterLockSlim intensitiesLock = new ReaderWriterLockSlim();
 
     public CarbonMetrics(IMeterFactory meterFactory, ILogger<CarbonMetrics> logger, IEmissionsHandler emissionsHandler, ILocationHandler locationHandler)
     {
@@ -30,39 +39,74 @@ public class CarbonMetrics : IDisposable
         string? version = typeof(CarbonMetrics).Assembly.GetName().Version?.ToString();
         this.ActivitySource = new ActivitySource(ActivitySourceName, version);
         this.meter = meterFactory.Create(MeterName, version);
+        UpdateLocations();
 
-        this.timer = new Timer(this.GetCarbon, null, 0, 5000);
+        this.timer = new Timer(this.GetCarbon, null, 0, UpdateInterval);
     }
 
-    public void Dispose(){
+    private void UpdateLocations()
+    {
+        Task<IDictionary<string, Location>> locationsTask = locationHandler.GetLocationsAsync();
+        locationLock.EnterWriteLock();
+        try
+        {
+            this.locations = locationsTask.Result.Keys.ToArray();
+        }
+        finally
+        {
+            locationLock.ExitWriteLock();
+        }
+        
+    }
+
+    public void Dispose()
+    {
         this.meter.Dispose();
         this.ActivitySource.Dispose();
     }
 
     public void GetCarbon(object state)
     {
-        Task<IDictionary<string, Location>> locationsTask = locationHandler.GetLocationsAsync();
-        string[] locationArray;
-        locationsTask.ContinueWith((Task<IDictionary<string, Location>> t) => {
-            IDictionary<string, Location> locations = t.Result;
-            locationArray = locations.Keys.ToArray();
-
-            //Use TestData
-            var day = rand.Next(2, 31);
-            var end = new DateTimeOffset(2022, 1, day, 0, 0, 0, 0, TimeSpan.Zero);
-            var start = new DateTimeOffset(2022, 1, day-1, 0, 0, 0, 0, TimeSpan.Zero);
-            IEnumerable<EmissionsData> emissions = emissionsHandler.GetEmissionsDataAsync(locationArray, start, end).Result;
-            foreach (var x in emissions){
-                if (!this.gauges.ContainsKey(x.Location)) {
-                    this.gauges[x.Location] = 
-                        this.meter.CreateObservableGauge<double>("carbon.aware.emission", () => GetEmission(x.Location));
+        //Use TestData
+        var day = rand.Next(2, 31);
+        var end = new DateTimeOffset(2022, 1, day, 0, 0, 0, 0, TimeSpan.Zero);
+        var start = new DateTimeOffset(2022, 1, day-1, 0, 0, 0, 0, TimeSpan.Zero);
+        locationLock.EnterReadLock();
+        try
+        {
+            IEnumerable<EmissionsData> emissions = emissionsHandler.GetEmissionsDataAsync(locations, start, end).Result;
+            foreach (var loc in locations){
+                if (!this.gauges.ContainsKey(loc)) {
+                    this.gauges[loc] = 
+                        this.meter.CreateObservableGauge<double>("carbon.aware.intensity", () => GetIntensity(loc));
                 }
-                this.emissions[x.Location] = new Measurement<double>(x.Rating, new TagList(){{"location", x.Location}});
+                intensitiesLock.EnterWriteLock();
+                var intensity = emissionsHandler.GetAverageCarbonIntensityAsync(loc, start, end).Result;
+                try
+                {
+                    this.intensities[loc] = new Measurement<double>(intensity, new TagList(){{"location", loc}});
+                }
+                finally
+                {
+                    intensitiesLock.ExitWriteLock();
+                }
             }
-        });
+        }
+        finally
+        {
+            locationLock.ExitReadLock();
+        }
     }
 
-    public Measurement<double> GetEmission(string location){
-        return this.emissions[location];
+    public Measurement<double> GetIntensity(string location){
+        intensitiesLock.EnterReadLock();
+        try
+        {
+            return this.intensities[location];
+        }
+        finally
+        {
+            intensitiesLock.ExitReadLock();
+        }
     }
 }
