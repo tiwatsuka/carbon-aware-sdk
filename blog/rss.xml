@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title>Carbon Aware SDK Blog</title>
+        <link>https://carbon-aware-sdk.greensoftware.foundation/blog</link>
+        <description>Carbon Aware SDK Blog</description>
+        <lastBuildDate>Sun, 14 Jan 2024 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <language>en</language>
+        <item>
+            <title><![CDATA[Release v1.2]]></title>
+            <link>https://carbon-aware-sdk.greensoftware.foundation/blog/release-v1.2</link>
+            <guid>https://carbon-aware-sdk.greensoftware.foundation/blog/release-v1.2</guid>
+            <pubDate>Sun, 14 Jan 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Added]]></description>
+            <content:encoded><![CDATA[<h3 id="added">Added</h3>
+<ul>
+<li><a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/pull/381">#381 Add Helm chart and workflow</a></li>
+<li>New package release for Helm charts available at <a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/pkgs/container/charts%2Fcarbon-aware-sdk">https://github.com/Green-Software-Foundation/carbon-aware-sdk/pkgs/container/charts%2Fcarbon-aware-sdk</a></li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li><a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/issues/232">#232 Generating SDK client does not work on linux</a></li>
+<li><a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/pull/393">#393 Fix: verify-azure-function-with-packages</a></li>
+<li><a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/pull/391">#391 fixing 3 broken links in overview.md</a></li>
+<li><a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/pull/389">#389 EMFree data source should regard specified time range</a></li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li><a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/pull/425">#425 Updating CONTRIBUTING.md</a></li>
+</ul>
+<h4 id="api">API</h4>
+<ul>
+<li></li>
+</ul>
+<h4 id="api-deployment">API Deployment</h4>
+<ul>
+<li></li>
+</ul>
+<h4 id="sdk">SDK</h4>
+<ul>
+<li></li>
+</ul>
+<h4 id="other">Other</h4>
+<ul>
+<li>Improved process leveraging the project boards at <a href="https://github.com/orgs/Green-Software-Foundation/projects/15/views/2">https://github.com/orgs/Green-Software-Foundation/projects/15/views/2</a></li>
+</ul>
+<p>For more details, checkout <a href="https://github.com/Green-Software-Foundation/carbon-aware-sdk/issues?q=label%3Av1.2+is%3Aclosed+">https://github.com/Green-Software-Foundation/carbon-aware-sdk/issues/232</a></p>]]></content:encoded>
+            <category>v1.2</category>
+            <category>release</category>
+        </item>
+        <item>
+            <title><![CDATA[Release v1.1]]></title>
+            <link>https://carbon-aware-sdk.greensoftware.foundation/blog/release-v1.1</link>
+            <guid>https://carbon-aware-sdk.greensoftware.foundation/blog/release-v1.1</guid>
+            <pubDate>Tue, 18 Jul 2023 00:00:00 GMT</pubDate>
+            <description><![CDATA[Added]]></description>
+            <content:encoded><![CDATA[<h3 id="added">Added</h3>
+<ul>
+<li>Added Electricity Maps (paid api) support for forecasting and historical data.</li>
+<li>Added ElectricityMaps (free api) support for historical data.  Note that this API does not support forecast capabilities.</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Fixed generated test data that had time bomb bug that was in test data, which caused integration tests to fail.  This is now automatically generated each time.</li>
+<li>Fixed some bugs that related to underlying data source errors surfacing as HTTP 500 errors from the API.  These should now be more consistent.</li>
+<li>Fixed an issue where UTF-8 passwords were encoded as ASCII for WattTime API, causing integration failure.</li>
+<li>Fixes some bugs in unit tests with uncaught scenarios, or faulty tests.</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>No previous API's were changed.</li>
+<li>Configuration has changed.  Refer to upgrading from 1.0.0 to 1.1.0 below.</li>
+<li>Time is now always in UTC.  Previously the API may have returned local time depending on underlying API.</li>
+</ul>
+<h4 id="api">API</h4>
+<ul>
+<li><code>/locations</code> - Show the list of configured named locations that can be used in the API.</li>
+<li><code>/api/v1/swagger.yaml</code> - Provides OpenAPI document now at public endpoint when deployed.</li>
+</ul>
+<h4 id="api-deployment">API Deployment</h4>
+<ul>
+<li>Configuration has changed.  Refer to upgrading from 1.0.0 to 1.1.0 below.</li>
+</ul>
+<h4 id="sdk">SDK</h4>
+<ul>
+<li>SDK was abstracted to provide a library for DLL import usage, which now allows users to use the SDK in their projects directly without the need to deploy an API.  This is useful in scenarios where the API can not be centralised.  Note - we still highly recommend centralising for management of the API and audit capabilities with observability.</li>
+<li>Functionality for forecast and historical data have been seperated into seperate interfaces.  This impacts configuration, see upgrading from 1.0.0 to 1.1.0 for more information.</li>
+<li>Additional tests across the SDK have been added.</li>
+<li>Aggregation tier in the SDK was removed, this should not impact users of the SDK, but may impact maintainers who were actively contributing.</li>
+</ul>
+<h4 id="other">Other</h4>
+<ul>
+<li>All contributors need to signoff commits for contribution using <code>git commit -s</code>.</li>
+<li>Added PR release workflow improvements for the project management of the CA SDK project team.</li>
+<li>Updated the project to prune stale PR's and issues to help with the management of the CA SDK project.</li>
+</ul>
+<h3 id="upgrading-from-100-to-110">Upgrading from 1.0.0 to 1.1.0</h3>
+<ul>
+<li>Configuration changes are required due to historical and forecast configuration now being decoupled.  Refer to - <a href="https://carbon-aware-sdk.greensoftware.foundation/docs/tutorial-extras/configuration">Configuration</a> for a guide. The following is provided as an example of the new data source configuration format.</li>
+</ul>
+<pre><code class="language-json">{
+  "DataSources": {
+    "EmissionsDataSource": "Json",
+    "ForecastDataSource": "WattTime",
+    "Configurations": {
+      "WattTime": {
+        "Type": "WattTime",
+        "Username": "username",
+        "Password": "password",
+        "BaseURL": "https://api2.watttime.org/v2/",
+        "Proxy": {
+          "useProxy": true,
+          "url": "http://10.10.10.1",
+          "username": "proxyUsername",
+          "password": "proxyPassword"
+        }
+      },
+      "ElectricityMaps": {
+        "Type": "ElectricityMaps",
+        "APITokenHeader": "auth-token",
+        "APIToken": "myAwesomeToken",
+        "BaseURL": "https://api.electricitymap.org/v3/"
+      },
+      "Json": {
+        "Type": "Json",
+        "DataFileLocation": "test-data-azure-emissions.json"
+      }
+    }
+  }
+}
+</code></pre>]]></content:encoded>
+            <category>v1.1</category>
+            <category>release</category>
+        </item>
+        <item>
+            <title><![CDATA[Release v1.0]]></title>
+            <link>https://carbon-aware-sdk.greensoftware.foundation/blog/release-v1.0</link>
+            <guid>https://carbon-aware-sdk.greensoftware.foundation/blog/release-v1.0</guid>
+            <pubDate>Sat, 01 Oct 2022 00:00:00 GMT</pubDate>
+            <description><![CDATA[Added]]></description>
+            <content:encoded><![CDATA[<h3 id="added">Added</h3>
+<ul>
+<li>Added Electricity Maps (paid api) support for forecasting and historical data.</li>
+<li>Added ElectricityMaps (free api) support for historical data.  Note that this API does not support forecast capabilities.</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Fixed generated test data that had time bomb bug that was in test data, which caused integration tests to fail.  This is now automatically generated each time.</li>
+<li>Fixed some bugs that related to underlying data source errors surfacing as HTTP 500 errors from the API.  These should now be more consistent.</li>
+<li>Fixed an issue where UTF-8 passwords were encoded as ASCII for WattTime API, causing integration failure.</li>
+<li>Fixes some bugs in unit tests with uncaught scenarios, or faulty tests.</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>No previous API's were changed.</li>
+<li>Configuration has changed.  Refer to upgrading from 1.0.0 to 1.1.0 below.</li>
+<li>Time is now always in UTC.  Previously the API may have returned local time depending on underlying API.</li>
+</ul>
+<h4 id="api">API</h4>
+<ul>
+<li><code>/locations</code> - Show the list of configured named locations that can be used in the API.</li>
+<li><code>/api/v1/swagger.yaml</code> - Provides OpenAPI document now at public endpoint when deployed.</li>
+</ul>
+<h4 id="api-deployment">API Deployment</h4>
+<ul>
+<li>Configuration has changed.  Refer to upgrading from 1.0.0 to 1.1.0 below.</li>
+</ul>
+<h4 id="sdk">SDK</h4>
+<ul>
+<li>SDK was abstracted to provide a library for DLL import usage, which now allows users to use the SDK in their projects directly without the need to deploy an API.  This is useful in scenarios where the API can not be centralised.  Note - we still highly recommend centralising for management of the API and audit capabilities with observability.</li>
+<li>Functionality for forecast and historical data have been seperated into seperate interfaces.  This impacts configuration, see upgrading from 1.0.0 to 1.1.0 for more information.</li>
+<li>Additional tests across the SDK have been added.</li>
+<li>Aggregation tier in the SDK was removed, this should not impact users of the SDK, but may impact maintainers who were actively contributing.</li>
+</ul>
+<h4 id="other">Other</h4>
+<ul>
+<li>All contributors need to signoff commits for contribution using <code>git commit -s</code>.</li>
+<li>Added PR release workflow improvements for the project management of the CA SDK project team.</li>
+<li>Updated the project to prune stale PR's and issues to help with the management of the CA SDK project.</li>
+</ul>
+<h3 id="upgrading-from-100-to-110">Upgrading from 1.0.0 to 1.1.0</h3>
+<ul>
+<li>Configuration changes are required due to historical and forecast configuration now being decoupled.  Refer to - <a href="https://carbon-aware-sdk.greensoftware.foundation/docs/tutorial-extras/configuration">Configuration</a> for a guide. The following is provided as an example of the new data source configuration format.</li>
+</ul>
+<pre><code class="language-json">{
+  "DataSources": {
+    "EmissionsDataSource": "Json",
+    "ForecastDataSource": "WattTime",
+    "Configurations": {
+      "WattTime": {
+        "Type": "WattTime",
+        "Username": "username",
+        "Password": "password",
+        "BaseURL": "https://api2.watttime.org/v2/",
+        "Proxy": {
+          "useProxy": true,
+          "url": "http://10.10.10.1",
+          "username": "proxyUsername",
+          "password": "proxyPassword"
+        }
+      },
+      "ElectricityMaps": {
+        "Type": "ElectricityMaps",
+        "APITokenHeader": "auth-token",
+        "APIToken": "myAwesomeToken",
+        "BaseURL": "https://api.electricitymap.org/v3/"
+      },
+      "Json": {
+        "Type": "Json",
+        "DataFileLocation": "test-data-azure-emissions.json"
+      }
+    }
+  }
+}
+</code></pre>]]></content:encoded>
+            <category>v1.0</category>
+            <category>release</category>
+        </item>
+        <item>
+            <title><![CDATA[Welcome to the Carbon Aware SDK documentation site]]></title>
+            <link>https://carbon-aware-sdk.greensoftware.foundation/blog/welcome</link>
+            <guid>https://carbon-aware-sdk.greensoftware.foundation/blog/welcome</guid>
+            <pubDate>Thu, 26 Aug 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[Carbon aware software does more when it can leverage greener energy sources, and less when the energy CO2 emissions are higher.]]></description>
+            <content:encoded><![CDATA[<p>Carbon aware software does more when it can leverage greener energy sources, and less when the energy CO2 emissions are higher.</p>
+<p>The Carbon Aware SDK is a toolset to help you measure the carbon emissions of your software, in turn helping you <strong>measure and reduce your software's carbon emissions</strong>, and choose when and where you run your software to make it greener.</p>
+<p><img alt="Carbon Aware Software" src="https://carbon-aware-sdk.greensoftware.foundation/assets/images/carbon-aware-software-827a8c0d6dcd3f664855aabfdf735bbf.png" width="1920" height="1080"></p>
+<p>By knowing the carbon emissions of the energy that powers your applications, you and your organisation can leverage greener energy sources to reduce your CO2 emissions by:</p>
+<ul>
+<li>Building  AI models when carbon emissions are lower</li>
+<li>Deploying software into the cloud in locations that have greener energy sources</li>
+<li>Running software updates at greener energy time windows</li>
+<li>Using data to run hypothetical models to understand how you could start driving impact and reduce emissions, drive business cases for change, and create a greener future.</li>
+</ul>
+<p>Within the <a href="https://greensoftware.foundation/articles/theory-of-change">Green Software Foundations Theory of Change</a>, we look at 3 pillars, that being <strong>Knowledge</strong>, <strong>Tech Culture</strong>, and <strong>Tooling</strong> as focus areas to drive this change.  The Carbon Aware SDK at its core sits firmly in the <strong>Tooling</strong> pillar, and also supports the other pillars, providing <strong>Knowledge</strong> through emissions data to inform change, and being core enabler for the <strong>Tech Culture</strong> for building carbon aware software.</p>
+<p>Companies including UBS and Vestas have already deployed the Carbon Aware SDK to build greener software, and you can too!</p>
+<p><em>Published in feb 2024 based on latest updates to the readme.md</em></p>]]></content:encoded>
+            <category>welcome</category>
+            <category>post</category>
+        </item>
+    </channel>
+</rss>
